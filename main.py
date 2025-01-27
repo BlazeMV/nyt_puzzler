@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request
-from itertools import permutations, product
 
 app = Flask(__name__)
 
@@ -25,20 +24,19 @@ def solve_letter_boxed(sides, word_list):
     valid_words = [word for word in word_list if
                    len(word) >= 3 and set(word).issubset(all_letters) and is_valid_word(word, sides)]
 
-    # Try to find a sequence of words that uses all letters
-    for word in valid_words:
-        used_letters = set(word)
-        print(all_letters)
-        if used_letters == all_letters:
-            return [word]
-        remaining_letters = all_letters - used_letters
-        # Recursively find the next word
-        for next_word in valid_words:
-            if next_word[0] == word[-1] and set(next_word).issubset(remaining_letters):
-                result = solve_letter_boxed(sides, word_list)
+    def backtrack(sequence, remaining_letters):
+        """Recursive backtracking to find a valid sequence of words."""
+        if not remaining_letters:
+            return sequence  # All letters have been used
+        last_letter = sequence[-1][-1] if sequence else None
+        for word in valid_words:
+            if (not sequence or word[0] == last_letter) and set(word).intersection(remaining_letters):
+                result = backtrack(sequence + [word], remaining_letters - set(word))
                 if result:
-                    return [word] + result
-    return None
+                    return result
+        return None
+
+    return backtrack([], all_letters)
 
 
 @app.route('/', methods=['GET', 'POST'])
