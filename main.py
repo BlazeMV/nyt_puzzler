@@ -44,10 +44,10 @@ def index():
     if request.method == 'POST':
         # Get the input from the form
         sides = [
-            request.form['side1'].strip().lower().split(),
-            request.form['side2'].strip().lower().split(),
-            request.form['side3'].strip().lower().split(),
-            request.form['side4'].strip().lower().split()
+            [request.form[f'side1-{i}'].strip().lower() for i in range(1, 4)],  # Top
+            [request.form[f'side2-{i}'].strip().lower() for i in range(1, 4)],  # Right
+            [request.form[f'side3-{i}'].strip().lower() for i in range(1, 4)],  # Bottom
+            [request.form[f'side4-{i}'].strip().lower() for i in range(1, 4)]  # Left
         ]
         # Solve the puzzle
         solution = solve_letter_boxed(sides, word_list)
@@ -55,13 +55,14 @@ def index():
         return render_template(
             'index.html',
             solution=" -> ".join(solution) if solution else "No solution found.",
-            side1=" ".join(sides[0]),
-            side2=" ".join(sides[1]),
-            side3=" ".join(sides[2]),
-            side4=" ".join(sides[3])
+            side1=[request.form[f'side1-{i}'].strip().lower() for i in range(1, 4)],
+            side2=[request.form[f'side2-{i}'].strip().lower() for i in range(1, 4)],
+            side3=[request.form[f'side3-{i}'].strip().lower() for i in range(1, 4)],
+            side4=[request.form[f'side4-{i}'].strip().lower() for i in range(1, 4)]
         )
-    return render_template('index.html', solution=None, side1="", side2="", side3="", side4="")
+    return render_template('index.html', solution=None, side1=["", "", ""], side2=["", "", ""], side3=["", "", ""],
+                           side4=["", "", ""])
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(port=3000, debug=True)

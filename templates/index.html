@@ -8,28 +8,58 @@
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
         }
         .container {
-            max-width: 600px;
-            margin: 0 auto;
+            text-align: center;
         }
-        .form-group {
-            margin-bottom: 15px;
+        .board {
+            display: grid;
+            grid-template-columns: repeat(5, 50px); /* 5 columns */
+            grid-template-rows: repeat(5, 50px); /* 5 rows */
+            gap: 5px;
+            margin: 20px auto;
         }
-        label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        input {
+        .board input {
             width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
+            height: 100%;
+            text-align: center;
+            font-size: 18px;
+            text-transform: uppercase;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+        }
+        .board input:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        .empty-cell {
+            /* Style for empty cells to maintain grid alignment */
+            visibility: hidden;
+        }
+        .solve-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .solve-button:hover {
+            background-color: #0056b3;
         }
         .solution {
             margin-top: 20px;
             padding: 10px;
             background-color: #f0f0f0;
             border-radius: 5px;
+            max-width: 400px;
+            word-wrap: break-word;
         }
     </style>
 </head>
@@ -37,23 +67,43 @@
     <div class="container">
         <h1>NYT Letter Boxed Solver</h1>
         <form method="POST">
-            <div class="form-group">
-                <label for="side1">Side 1 (Top):</label>
-                <input type="text" id="side1" name="side1" value="{{ side1 }}" placeholder="Enter letters separated by spaces (e.g., a b c)" required>
+            <div class="board">
+                <!-- Row 1 -->
+                <div class="empty-cell"></div>
+                <input type="text" id="side1-1" name="side1-1" maxlength="1" value="{{ side1[0] }}" required>
+                <input type="text" id="side1-2" name="side1-2" maxlength="1" value="{{ side1[1] }}" required>
+                <input type="text" id="side1-3" name="side1-3" maxlength="1" value="{{ side1[2] }}" required>
+                <div class="empty-cell"></div>
+
+                <!-- Row 2 -->
+                <input type="text" id="side4-1" name="side4-1" maxlength="1" value="{{ side4[0] }}" required>
+                <div class="empty-cell"></div>
+                <div class="empty-cell"></div>
+                <div class="empty-cell"></div>
+                <input type="text" id="side2-1" name="side2-1" maxlength="1" value="{{ side2[0] }}" required>
+
+                <!-- Row 3 -->
+                <input type="text" id="side4-2" name="side4-2" maxlength="1" value="{{ side4[1] }}" required>
+                <div class="empty-cell"></div>
+                <div class="empty-cell"></div>
+                <div class="empty-cell"></div>
+                <input type="text" id="side2-2" name="side2-2" maxlength="1" value="{{ side2[1] }}" required>
+
+                <!-- Row 4 -->
+                <input type="text" id="side4-3" name="side4-3" maxlength="1" value="{{ side4[2] }}" required>
+                <div class="empty-cell"></div>
+                <div class="empty-cell"></div>
+                <div class="empty-cell"></div>
+                <input type="text" id="side2-3" name="side2-3" maxlength="1" value="{{ side2[2] }}" required>
+
+                <!-- Row 5 -->
+                <div class="empty-cell"></div>
+                <input type="text" id="side3-1" name="side3-1" maxlength="1" value="{{ side3[0] }}" required>
+                <input type="text" id="side3-2" name="side3-2" maxlength="1" value="{{ side3[1] }}" required>
+                <input type="text" id="side3-3" name="side3-3" maxlength="1" value="{{ side3[2] }}" required>
+                <div class="empty-cell"></div>
             </div>
-            <div class="form-group">
-                <label for="side2">Side 2 (Right):</label>
-                <input type="text" id="side2" name="side2" value="{{ side2 }}" placeholder="Enter letters separated by spaces (e.g., d e f)" required>
-            </div>
-            <div class="form-group">
-                <label for="side3">Side 3 (Bottom):</label>
-                <input type="text" id="side3" name="side3" value="{{ side3 }}" placeholder="Enter letters separated by spaces (e.g., g h i)" required>
-            </div>
-            <div class="form-group">
-                <label for="side4">Side 4 (Left):</label>
-                <input type="text" id="side4" name="side4" value="{{ side4 }}" placeholder="Enter letters separated by spaces (e.g., j k l)" required>
-            </div>
-            <button type="submit">Solve</button>
+            <button type="submit" class="solve-button">Solve</button>
         </form>
 
         {% if solution %}
