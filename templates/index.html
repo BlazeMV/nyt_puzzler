@@ -113,5 +113,42 @@
         </div>
         {% endif %}
     </div>
+
+    <script>
+        // Get all input elements
+        const inputs = Array.from(document.querySelectorAll('.board input'));
+
+        // Sort inputs by tabindex
+        inputs.sort((a, b) => a.tabIndex - b.tabIndex);
+
+        // Auto-focus the first input on page load
+        if (inputs.length > 0) {
+            inputs[0].focus();
+        }
+
+        // Add event listeners to each input
+        inputs.forEach((input, index) => {
+            // Move to next input on typing
+            input.addEventListener('input', (e) => {
+                if (e.target.value.length === 1) {
+                    const nextInput = inputs[index + 1];
+                    if (nextInput) {
+                        nextInput.focus();
+                    }
+                }
+            });
+
+            // Handle backspace
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && e.target.value.length === 0) {
+                    const prevInput = inputs[index - 1];
+                    if (prevInput) {
+                        prevInput.focus();
+                        prevInput.value = ''; // Clear the previous input
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 </html>
