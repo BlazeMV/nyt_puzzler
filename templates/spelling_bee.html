@@ -2,62 +2,142 @@
 
 {% block styles %}
 <style>
-    /* Grid layout for the hexagons */
-    .honeycomb-grid {
+    .beehive {
         display: grid;
-        grid-template-columns: repeat(3, 86px);
-        grid-template-rows: repeat(3, 92px);
-        gap: 10px;
+        grid-template-columns: repeat(3, 80px);
+        grid-template-rows: repeat(3, 80px);
+        gap: 5px;
+        margin: 20px auto;
+        position: relative;
     }
 
-    /* Individual hexagon styling */
     .hexagon {
-        width: 86px;
-        height: 92px;
-        background-color: #ffd700; /* Golden color */
-        clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+        width: 97px;
+        height: 79px;
+        background-color: gold;
         display: flex;
         justify-content: center;
         align-items: center;
+        clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+        position: absolute;
+    }
+
+    /* Positioning hexagons */
+    .hexagon:nth-child(1) { transform: translate(calc(75% + 5px), 0); }  /* Top */
+    .hexagon:nth-child(2) { transform: translate(0, calc(50% + 5px)); }   /* Top Left */
+    .hexagon:nth-child(3) { transform: translate(calc(150% + 10px), calc(50% + 5px)); } /* Top Right */
+    .hexagon:nth-child(4) { transform: translate(calc(75% + 5px), calc(100% + 7px)); background-color: orange; } /* Center */
+    .hexagon:nth-child(5) { transform: translate(0, calc(150% + 10px)); }  /* Bottom Left */
+    .hexagon:nth-child(6) { transform: translate(calc(150% + 10px), calc(150% + 10px)); } /* Bottom Right */
+    .hexagon:nth-child(7) { transform: translate(calc(75% + 5px), calc(200% + 12px)); }  /* Bottom */
+
+    .beehive .hexagon input {
+        width: 100%;
+        height: 100%;
+        text-align: center;
         font-size: 24px;
         font-weight: bold;
-        color: #333;
+        text-transform: uppercase;
+        border: none;
+        background: transparent;
+    }
+
+    .solve-button {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
         cursor: pointer;
-        transition: background-color 0.3s ease;
+    }
+    .solve-button:hover {
+        background-color: #0056b3;
+    }
+    .solution {
+        margin-top: 20px;
+        padding: 10px;
+        background-color: #f0f0f0;
+        border-radius: 5px;
+        max-width: 400px;
+        word-wrap: break-word;
+    }
+    .solutions-list {
+        margin-top: 20px;
+        text-align: left;
     }
 
-    /* Center hexagon (usually the required letter) */
-    .center-hexagon {
-        background-color: #ffa500; /* Orange color */
-    }
-
-    /* Hover effect */
-    .hexagon:hover {
-        background-color: #ffcc00; /* Lighter gold on hover */
-    }
 </style>
 {% endblock %}
 
 {% block contents %}
 <h1>Spelling Bee</h1>
-<div class="honeycomb-grid">
-    <!-- Top row -->
-    <div class="hexagon">A</div>
-    <div class="hexagon">B</div>
-    <div class="hexagon">C</div>
-
-    <!-- Middle row -->
-    <div class="hexagon">D</div>
-    <div class="hexagon center-hexagon">E</div> <!-- Center letter -->
-    <div class="hexagon">F</div>
-
-    <!-- Bottom row -->
-    <div class="hexagon">G</div>
-    <div class="hexagon">H</div>
-    <div class="hexagon">I</div>
+<form method="POST">
+    <div class="beehive">
+        <div class="hexagon">
+            <input type="text" id="letter2" name="letter2" maxlength="1" value="{{ letters[2] }}" tabindex="2" required></div>
+        <div class="hexagon">
+            <input type="text" id="letter7" name="letter7" maxlength="1" value="{{ letters[7] }}" tabindex="7" required></div>
+        <div class="hexagon">
+            <input type="text" id="letter3" name="letter3" maxlength="1" value="{{ letters[3] }}" tabindex="3" required></div>
+        <div class="hexagon">
+            <input type="text" id="letter1" name="letter1" maxlength="1" value="{{ letters[1] }}" tabindex="1" required></div>
+        <div class="hexagon">
+            <input type="text" id="letter6" name="letter6" maxlength="1" value="{{ letters[6] }}" tabindex="6" required></div>
+        <div class="hexagon">
+            <input type="text" id="letter4" name="letter4" maxlength="1" value="{{ letters[4] }}" tabindex="4" required></div>
+        <div class="hexagon">
+            <input type="text" id="letter5" name="letter5" maxlength="1" value="{{ letters[5] }}" tabindex="5" required></div>
+    </div>
+    <button type="submit" class="solve-button">Solve</button>
+</form>
+{% if solutions %}
+<div class="solutions-list">
+    <h2>Possible words:</h2>
+    {% for solution in solutions %}
+    <div class="solution">
+        <p>{{ solution }}</p>
+    </div>
+    {% endfor %}
 </div>
+{% endif %}
 {% endblock %}
 
 {% block scripts %}
+<script>
+    // Get all input elements
+    const inputs = Array.from(document.querySelectorAll('.beehive input'));
 
+    // Sort inputs by tabindex
+    inputs.sort((a, b) => a.tabIndex - b.tabIndex);
+
+    // Auto-focus the first input on page load
+    if (inputs.length > 0) {
+        inputs[0].focus();
+    }
+
+    // Add event listeners to each input
+    inputs.forEach((input, index) => {
+        // Move to next input on typing
+        input.addEventListener('input', (e) => {
+            if (e.target.value.length === 1) {
+                const nextInput = inputs[index + 1];
+                if (nextInput) {
+                    nextInput.focus();
+                }
+            }
+        });
+
+        // Handle backspace
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' && e.target.value.length === 0) {
+                const prevInput = inputs[index - 1];
+                if (prevInput) {
+                    prevInput.focus();
+                    prevInput.value = ''; // Clear the previous input
+                }
+            }
+        });
+    });
+</script>
 {% endblock %}
